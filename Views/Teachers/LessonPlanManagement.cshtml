@@ -1,0 +1,307 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+    ViewBag.Title = "教案管理";
+    ViewBag.ActiveMenu = "LessonPlanManagement";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h1 class="page-title">教案管理</h1>
+
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+        <i class="fas fa-upload me-2"></i> 上传新教案
+    </button>
+</div>
+
+<div class="content-card">
+    <h3><i class="fas fa-folder-open text-primary me-2"></i> 教案文件列表</h3>
+    <p class="text-muted">管理您的教案文件，可以查看、下载或删除</p>
+
+    <div class="table-responsive mt-4">
+        <table id="fileList" class="table">
+            <thead>
+                <tr>
+                    <th>教案名称</th>
+                    <th>上传日期</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 教案列表将由JavaScript动态填充 -->
+                <tr id="empty-row">
+                    <td colspan="3" class="text-center py-4">
+                        <i class="fas fa-spinner fa-spin me-2"></i> 正在加载教案列表...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 上传教案模态框 -->
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">上传新教案</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadForm">
+                    <div class="mb-3">
+                        <label for="lessonName" class="form-label">教案名称</label>
+                        <input type="text" class="form-control" id="lessonName" placeholder="请输入教案名称">
+                    </div>
+                    <div class="mb-3">
+                        <label for="fileInput" class="form-label">选择文件</label>
+                        <input type="file" class="form-control" id="fileInput">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="submitUpload">
+                    <i class="fas fa-upload me-2"></i> 确认上传
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认模态框 -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">确认删除</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                确定要删除这个教案吗？此操作无法撤销。
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">确认删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // 获取URL中的查询参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const account = urlParams.get('account');
+
+            // 加载教案列表
+            loadLessonPlans(account);
+
+            // 上传按钮点击事件
+            $('#submitUpload').on('click', function () {
+                uploadLessonPlan(account);
+            });
+        });
+
+        // 加载教案列表函数
+        function loadLessonPlans(account) {
+            const fileList = document.getElementById('fileList').getElementsByTagName('tbody')[0];
+
+            fetch(`/Teachers/GetLessonPlans?account=${account}`)
+                .then(response => response.json())
+                .then(data => {
+                    // 移除加载指示行
+                    document.getElementById('empty-row').remove();
+
+                    if (data.length === 0) {
+                        // 如果没有教案，显示提示信息
+                        const emptyRow = document.createElement('tr');
+                        emptyRow.innerHTML = `
+                                    <td colspan="3" class="text-center py-4">
+                                        <i class="fas fa-folder-open text-muted me-2"></i> 暂无教案文件，点击上方"上传新教案"按钮添加
+                                    </td>
+                                `;
+                        fileList.appendChild(emptyRow);
+                    } else {
+                        // 有教案数据，添加到表格
+                        data.forEach(lessonPlan => {
+                            // 格式化上传日期
+                            let formattedDate = "未知日期";
+                            if (lessonPlan.uploadDate) {
+                                const date = new Date(lessonPlan.uploadDate);
+                                formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                            }
+
+                            // 创建一个新的表格行
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                        <td>
+                                            <a href="${lessonPlan.fileUrl}" target="_blank" class="text-decoration-none">
+                                                <i class="fas fa-file-alt text-primary me-2"></i>${lessonPlan.lessonName}
+                                            </a>
+                                        </td>
+                                        <td>${formattedDate}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="${lessonPlan.fileUrl}" target="_blank" class="btn btn-outline-primary">
+                                                    <i class="fas fa-download"></i> 下载
+                                                </a>
+                                                <button class="btn btn-outline-danger delete-btn" data-id="${lessonPlan.id}">
+                                                    <i class="fas fa-trash-alt"></i> 删除
+                                                </button>
+                                            </div>
+                                        </td>
+                                    `;
+                            fileList.appendChild(row);
+                        });
+
+                        // 为删除按钮添加事件
+                        setupDeleteButtons();
+                    }
+                })
+                .catch(error => {
+                    console.error('获取教案列表失败:', error);
+                    // 显示错误信息
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.innerHTML = `
+                                <td colspan="3" class="text-center py-4 text-danger">
+                                    <i class="fas fa-exclamation-circle me-2"></i> 加载教案列表失败，请刷新页面重试
+                                </td>
+                            `;
+                    fileList.innerHTML = '';
+                    fileList.appendChild(emptyRow);
+                });
+        }
+
+        // 设置删除按钮事件
+        function setupDeleteButtons() {
+            $('.delete-btn').on('click', function () {
+                const lessonPlanId = $(this).data('id');
+                const row = $(this).closest('tr');
+
+                // 显示确认对话框
+                $('#deleteModal').modal('show');
+
+                // 确认删除按钮事件
+                $('#confirmDelete').off('click').on('click', function () {
+                    // 发送删除请求
+                    fetch(`/Teachers/DeleteLessonPlan/${lessonPlanId}`)
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.success) {
+                                // 删除成功，移除表格行
+                                row.remove();
+                                $('#deleteModal').modal('hide');
+
+                                // 检查表格是否为空
+                                if ($('#fileList tbody tr').length === 0) {
+                                    const emptyRow = document.createElement('tr');
+                                    emptyRow.innerHTML = `
+                                                <td colspan="3" class="text-center py-4">
+                                                    <i class="fas fa-folder-open text-muted me-2"></i> 暂无教案文件，点击上方"上传新教案"按钮添加
+                                                </td>
+                                            `;
+                                    $('#fileList tbody').append(emptyRow);
+                                }
+
+                                // 显示成功消息
+                                showAlert('success', '教案删除成功');
+                            } else {
+                                $('#deleteModal').modal('hide');
+                                showAlert('danger', '删除失败，请稍后重试');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('删除教案失败:', error);
+                            $('#deleteModal').modal('hide');
+                            showAlert('danger', '删除失败，请稍后重试');
+                        });
+                });
+            });
+        }
+
+        // 上传教案函数
+        function uploadLessonPlan(account) {
+            const lessonName = $('#lessonName').val();
+            const fileInput = document.getElementById('fileInput');
+
+            if (!lessonName) {
+                showAlert('warning', '请输入教案名称');
+                return;
+            }
+
+            if (!fileInput.files[0]) {
+                showAlert('warning', '请选择要上传的文件');
+                return;
+            }
+
+            // 显示上传中状态
+            const submitBtn = $('#submitUpload');
+            const originalBtnText = submitBtn.html();
+            submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i> 上传中...');
+            submitBtn.prop('disabled', true);
+
+            // 创建FormData对象
+            const formData = new FormData();
+            formData.append('lessonName', lessonName);
+            formData.append('file', fileInput.files[0]);
+            formData.append('teacherAccount', account);
+
+            // 发送上传请求
+            fetch('/File/Create', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // 上传成功
+                        $('#uploadModal').modal('hide');
+
+                        // 清空表单
+                        $('#lessonName').val('');
+                        $('#fileInput').val('');
+
+                        // 显示成功消息
+                        showAlert('success', '教案上传成功');
+
+                        // 重新加载教案列表
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        // 上传失败
+                        showAlert('danger', '上传失败，请稍后重试');
+                    }
+
+                    // 恢复按钮状态
+                    submitBtn.html(originalBtnText);
+                    submitBtn.prop('disabled', false);
+                })
+                .catch(error => {
+                    console.error('上传教案失败:', error);
+                    showAlert('danger', '上传失败，请稍后重试');
+
+                    // 恢复按钮状态
+                    submitBtn.html(originalBtnText);
+                    submitBtn.prop('disabled', false);
+                });
+        }
+
+        // 显示提示消息
+        function showAlert(type, message) {
+            const alertHtml = `
+                        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                            ${message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+
+            // 添加到页面顶部
+            $('.page-header').after(alertHtml);
+
+            // 3秒后自动关闭
+            setTimeout(() => {
+                $('.alert').alert('close');
+            }, 3000);
+        }
+    </script>
+}

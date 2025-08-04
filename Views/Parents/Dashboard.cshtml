@@ -1,0 +1,1295 @@
+﻿@model ParentDashboardViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家长中心 - 学习数据分析</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #1e88e5;
+            --secondary-color: #f5f5f5;
+            --accent-color: #ff5722;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-light: #999;
+            --border-color: #ddd;
+            --understood-color: #4caf50;
+            --learning-color: #2196f3;
+            --difficult-color: #f44336;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f8f9fa;
+            color: var(--text-primary);
+        }
+
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #1976d2, #0d47a1);
+            color: white;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .sidebar-menu {
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #fff;
+        }
+
+        .menu-icon {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-info {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .user-name {
+            font-weight: bold;
+        }
+
+        .user-role {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .time-filter {
+            display: flex;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .time-filter-option {
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .time-filter-option:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .time-filter-option.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 卡片样式 */
+        .dashboard-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 24px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title-icon {
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+
+        /* 学科标签 */
+        .subject-tabs {
+            display: flex;
+            margin-bottom: 24px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .subject-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .subject-tab:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .subject-tab.active {
+            background-color: rgba(0, 0, 0, 0.03);
+            border-bottom-color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* 数据卡片网格 */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .data-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+
+        .data-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .data-card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            background-color: rgba(30, 136, 229, 0.1);
+            color: var(--primary-color);
+        }
+
+        .data-card-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .data-card-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .data-card-trend {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .trend-up {
+            color: var(--understood-color);
+        }
+
+        .trend-down {
+            color: var(--difficult-color);
+        }
+
+        /* 为知识点统计创建彩色标记 */
+        .knowledge-mastery {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .mastery-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .mastery-understood {
+            background-color: var(--understood-color);
+        }
+
+        .mastery-learning {
+            background-color: var(--learning-color);
+        }
+
+        .mastery-difficult {
+            background-color: var(--difficult-color);
+        }
+
+        .mastery-count {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            padding: 2px 8px;
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* 知识点列表样式 */
+        .knowledge-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .knowledge-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .knowledge-name {
+            flex-grow: 1;
+        }
+
+        .knowledge-stats {
+            display: flex;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .stat-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 4px;
+            font-size: 10px;
+            color: white;
+        }
+
+        .understood-bg {
+            background-color: var(--understood-color);
+        }
+
+        .learning-bg {
+            background-color: var(--learning-color);
+        }
+
+        .difficult-bg {
+            background-color: var(--difficult-color);
+        }
+
+        /* 进度条样式 */
+        .progress-container {
+            height: 8px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-understood {
+            background-color: var(--understood-color);
+        }
+
+        .progress-learning {
+            background-color: var(--learning-color);
+        }
+
+        .progress-difficult {
+            background-color: var(--difficult-color);
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* 没有数据的样式 */
+        .no-data {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .no-data-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* 响应式调整 */
+        @@media (max-width: 992px) {
+            .dashboard-layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 10px 0;
+            }
+
+            .data-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @@keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .progress-container {
+            height: 8px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 0;
+            transition: width 0.5s ease;
+        }
+        /* 交流次数图表样式 */
+.interaction-chart-container {
+    height: 350px;
+    margin-bottom: 20px;
+}
+
+/* 表格样式优化 */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* 星星评级样式 */
+.fa-star {
+    margin-right: 2px;
+}
+
+/* 交流频率指标说明样式 */
+.interaction-legend {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+.interaction-legend-item {
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+}
+
+.interaction-legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+/* 让交流次数区域清晰分离 */
+#interaction-details {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+    margin-top: 15px;
+}
+        /* 添加紫色样式类 */
+        .bg-purple {
+            background-color: #9c27b0;
+            color: white;
+        }
+
+        /* 调整交流指标图表样式 */
+        .interaction-legend-item .badge {
+            padding: 4px 8px;
+        }
+
+        /* 提高图表清晰度 */
+        .chart-container {
+            background-color: white;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        /* 图表说明样式 */
+        #activity-legend .badge {
+            padding: 4px 8px;
+        }
+
+/* 交流频率指标动画效果 */
+@@keyframes star-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.pulse-star {
+    animation: star-pulse 1s infinite;
+}
+
+/* 添加响应式调整 */
+@@media (max-width: 768px) {
+    #interaction-chart {
+        height: 300px !important;
+    }
+    
+    #interaction-details .table th,
+    #interaction-details .table td {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- 左侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">智领学程</div>
+                <div class="sidebar-subtitle">家长数据中心</div>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-item active">
+                    <div class="menu-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="menu-text">学习数据分析</div>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-icon"><i class="fas fa-book"></i></div>
+                    <div class="menu-text">学习内容查看</div>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
+                    <div class="menu-text">孩子信息管理</div>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-icon"><i class="fas fa-cog"></i></div>
+                    <div class="menu-text">设置</div>
+                </div>
+            </div>
+
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <div class="user-name">@Model.ParentName</div>
+                    <div class="user-role">家长账号</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">@Model.StudentName 的学习数据</h1>
+                <div class="time-filter">
+                    <div class="time-filter-option active" data-period="week">本周</div>
+                    <div class="time-filter-option" data-period="month">本月</div>
+                    <div class="time-filter-option" data-period="all">总览</div>
+                </div>
+            </div>
+
+            <!-- 学科选择标签 -->
+            <div class="subject-tabs">
+                <div class="subject-tab active" data-subject="chinese">语文</div>
+                <div class="subject-tab" data-subject="math">数学</div>
+                <div class="subject-tab" data-subject="english">英语</div>
+                <div class="subject-tab" data-subject="all">全部科目</div>
+            </div>
+
+            <!-- 数据概览卡片 -->
+            <div class="data-grid">
+                <div class="data-card">
+                    <div class="data-card-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div class="data-card-title">提问次数</div>
+                    <div class="data-card-value" id="total-questions">0</div>
+                    <div class="data-card-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> <span id="question-trend">0%</span> 较上期
+                    </div>
+                </div>
+
+                <div class="data-card">
+                    <div class="data-card-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="data-card-title">涉及知识点数</div>
+                    <div class="data-card-value" id="total-knowledge-points">0</div>
+                    <div class="data-card-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> <span id="knowledge-trend">0%</span> 较上期
+                    </div>
+                </div>
+
+                <div class="data-card">
+                    <div class="data-card-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="data-card-title">理解程度</div>
+                    <div class="data-card-value" id="mastery-percentage">0%</div>
+                    <div class="progress-container">
+                        <div class="progress-bar progress-understood" id="understood-progress" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学习活跃度图表 -->
+            <div class="dashboard-card">
+                <div class="card-title">
+                    <i class="fas fa-chart-line card-title-icon"></i> 学习活跃度趋势
+                </div>
+                <!-- 添加缺失的canvas元素 -->
+                <div class="chart-container">
+                    <canvas id="activity-chart"></canvas>
+                </div>
+                <div id="knowledge-list" class="knowledge-list">
+                    <!-- 知识点将在这里动态生成 -->
+                </div>
+            </div>
+
+            <!-- 学习掌握情况 -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="dashboard-card">
+                        <div class="card-title">
+                            <i class="fas fa-check-circle card-title-icon"></i> 知识点掌握情况
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="mastery-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="dashboard-card">
+                        <div class="card-title">
+                            <i class="fas fa-list card-title-icon"></i> 理解程度分布
+                        </div>
+                        <div id="understanding-distribution">
+                            <div class="knowledge-mastery">
+                                <div class="mastery-indicator mastery-understood"></div>
+                                <div>已透彻理解</div>
+                                <div class="mastery-count" id="understood-count">0</div>
+                            </div>
+                            <div class="knowledge-mastery">
+                                <div class="mastery-indicator mastery-learning"></div>
+                                <div>正在学习中</div>
+                                <div class="mastery-count" id="learning-count">0</div>
+                            </div>
+                            <div class="knowledge-mastery">
+                                <div class="mastery-indicator mastery-difficult"></div>
+                                <div>难以理解</div>
+                                <div class="mastery-count" id="difficult-count">0</div>
+                            </div>
+                        </div>
+                        <div class="chart-container mt-4">
+                            <canvas id="understanding-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 知识点详情 -->
+            <!-- 在知识点详情卡片内添加交流次数可视化部分 -->
+            <div class="dashboard-card">
+                <div class="card-title">
+                    <i class="fas fa-comments card-title-icon"></i> 知识点交流频率
+                </div>
+                <div class="chart-container">
+                    <canvas id="interaction-chart"></canvas>
+                </div>
+                <div id="interaction-details" class="mt-3">
+                    <!-- 交流详情将在这里动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 存储学生账号
+        const studentAccount = "@Model.StudentAccount";
+
+        // 当前选中的时间段和学科
+        let currentPeriod = 'week';
+        let currentSubject = 'chinese';
+
+        // 加载数据的函数
+        async function loadData() {
+            try {
+                showLoading();
+
+                // 获取统计数据
+                const statsResponse = await fetch(`/Parents/GetLearningStats?studentAccount=${studentAccount}&period=${currentPeriod}&subject=${currentSubject}`);
+                const stats = await statsResponse.json();
+
+                if (stats.code === 0) {
+                    updateDashboardStats(stats.data);
+                } else {
+                    console.error("获取学习统计数据失败:", stats.msg);
+                }
+
+                // 获取知识点详情
+                const knowledgeResponse = await fetch(`/Parents/GetKnowledgePointsDetails?studentAccount=${studentAccount}&period=${currentPeriod}&subject=${currentSubject}`);
+                const knowledgeData = await knowledgeResponse.json();
+
+                if (knowledgeData.code === 0) {
+                    renderKnowledgePointsList(knowledgeData.data);
+                    // 添加这一行，渲染交流次数图表
+                    renderInteractionChart(knowledgeData.data);
+                } else {
+                    console.error("获取知识点详情失败:", knowledgeData.msg);
+                }
+
+
+                // 获取活跃度趋势数据
+                const activityResponse = await fetch(`/Parents/GetActivityTrend?studentAccount=${studentAccount}&period=${currentPeriod}&subject=${currentSubject}`);
+                const activityData = await activityResponse.json();
+
+                if (activityData.code === 0) {
+                    renderActivityChart(activityData.data);
+                } else {
+                    console.error("获取活跃度趋势数据失败:", activityData.msg);
+                }
+
+                hideLoading();
+            } catch (error) {
+                console.error("加载数据时出错:", error);
+                hideLoading();
+            }
+        }
+
+        // 更新仪表盘统计数据
+        function updateDashboardStats(stats) {
+            // 更新提问次数
+            $("#total-questions").text(stats.totalQuestions);
+            $("#question-trend").text(stats.questionTrend + "%");
+            $("#question-trend").parent().removeClass("trend-up trend-down").addClass(stats.questionTrend >= 0 ? "trend-up" : "trend-down");
+            $("#question-trend").prev("i").removeClass("fa-arrow-up fa-arrow-down").addClass(stats.questionTrend >= 0 ? "fa-arrow-up" : "fa-arrow-down");
+
+            // 更新知识点数量
+            $("#total-knowledge-points").text(stats.totalKnowledgePoints);
+            $("#knowledge-trend").text(stats.knowledgeTrend + "%");
+            $("#knowledge-trend").parent().removeClass("trend-up trend-down").addClass(stats.knowledgeTrend >= 0 ? "trend-up" : "trend-down");
+            $("#knowledge-trend").prev("i").removeClass("fa-arrow-up fa-arrow-down").addClass(stats.knowledgeTrend >= 0 ? "fa-arrow-up" : "fa-arrow-down");
+
+            // 更新理解程度
+            $("#mastery-percentage").text(Math.round(stats.masteryPercentage) + "%");
+            $("#understood-progress").css("width", stats.masteryPercentage + "%");
+
+            // 更新理解程度分布
+            $("#understood-count").text(stats.understoodCount);
+            $("#learning-count").text(stats.learningCount);
+            $("#difficult-count").text(stats.difficultCount);
+
+            // 更新掌握情况图表
+            renderMasteryChart(stats.masteryDistribution);
+
+            // 更新理解程度图表
+            renderUnderstandingChart(stats.understoodCount, stats.learningCount, stats.difficultCount);
+        }
+
+        // 渲染学习活跃度趋势图表（包含交流次数）
+        function renderActivityChart(data) {
+            const ctx = document.getElementById('activity-chart').getContext('2d');
+
+            // 如果已经存在图表，则销毁它
+            if (window.activityChart) {
+                window.activityChart.destroy();
+            }
+
+            // 计算学习效率（知识点/提问比率）
+            const knowledgeEfficiency = data.dates.map((_, index) => {
+                const questions = data.questions[index];
+                return questions > 0 ? parseFloat((data.knowledgePoints[index] / questions).toFixed(1)) : 0;
+            });
+
+            // 计算交流深度（交流次数/提问次数）- 每次提问平均的交流轮次
+            const interactionDepth = data.dates.map((_, index) => {
+                const questions = data.questions[index];
+                return questions > 0 ? parseFloat((data.interactions[index] / questions).toFixed(1)) : 0;
+            });
+
+            window.activityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.dates,
+                    datasets: [
+                        {
+                            label: '提问次数',
+                            data: data.questions,
+                            borderColor: '#1e88e5',
+                            backgroundColor: 'rgba(30, 136, 229, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: false,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '交流次数',
+                            data: data.interactions,
+                            borderColor: '#9c27b0',
+                            backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: false,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '知识点数量',
+                            data: data.knowledgePoints,
+                            borderColor: '#4caf50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: false,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '交流深度',
+                            data: interactionDepth,
+                            borderColor: '#ff9800',
+                            backgroundColor: 'rgba(255, 152, 0, 0)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointStyle: 'rectRot',
+                            pointRadius: 5,
+                            fill: false,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: '数量'
+                            },
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '交流深度'
+                            },
+                            beginAtZero: true,
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 添加图表说明
+            const chartContainer = document.getElementById('activity-chart').parentNode;
+            let legendEl = document.getElementById('activity-legend');
+
+            if (!legendEl) {
+                legendEl = document.createElement('div');
+                legendEl.id = 'activity-legend';
+                legendEl.className = 'mt-3 p-2 small bg-light rounded';
+                legendEl.innerHTML = `
+                    <div><i class="fas fa-info-circle me-1 text-primary"></i> <strong>学习活跃度指标说明：</strong></div>
+                    <div class="mt-1"><span class="badge bg-primary me-1">提问次数</span> 学生发起的学习会话数量</div>
+                    <div class="mt-1"><span class="badge bg-purple me-1">交流次数</span> 学生在学习过程中的跟进交流数量</div>
+                    <div class="mt-1"><span class="badge bg-success me-1">知识点数量</span> 学生学习涉及的知识点总数</div>
+                    <div class="mt-1"><span class="badge bg-warning text-dark me-1">交流深度</span> 每次提问的平均交流轮次，反映学习深入程度</div>
+                `;
+                chartContainer.after(legendEl);
+            }
+        }
+
+        // 渲染掌握情况图表
+        function renderMasteryChart(data) {
+            const ctx = document.getElementById('mastery-chart').getContext('2d');
+
+            // 如果已经存在图表，则销毁它
+            if (window.masteryChart) {
+                window.masteryChart.destroy();
+            }
+
+            window.masteryChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['已透彻理解', '正在学习中', '难以理解'],
+                    datasets: [{
+                        data: [data.understood, data.learning, data.difficult],
+                        backgroundColor: [
+                            '#4caf50',
+                            '#2196f3',
+                            '#f44336'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 渲染理解程度图表
+        function renderUnderstandingChart(understood, learning, difficult) {
+            const ctx = document.getElementById('understanding-chart').getContext('2d');
+
+            // 如果已经存在图表，则销毁它
+            if (window.understandingChart) {
+                window.understandingChart.destroy();
+            }
+
+            window.understandingChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['已透彻理解', '正在学习中', '难以理解'],
+                    datasets: [{
+                        label: '知识点数量',
+                        data: [understood, learning, difficult],
+                        backgroundColor: [
+                            '#4caf50',
+                            '#2196f3',
+                            '#f44336'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 渲染知识点列表
+        function renderKnowledgePointsList(knowledgePoints) {
+            const knowledgeList = document.getElementById('knowledge-list');
+
+            if (knowledgePoints.length === 0) {
+                knowledgeList.innerHTML = `
+                    <div class="no-data">
+                        <div class="no-data-icon"><i class="fas fa-search"></i></div>
+                        <div>暂无数据</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+
+            knowledgePoints.forEach(point => {
+                // 计算总计数
+                const total = point.understoodCount + point.learningCount + point.difficultCount;
+
+                // 计算百分比
+                const understoodPercent = Math.round((point.understoodCount / total) * 100) || 0;
+                const learningPercent = Math.round((point.learningCount / total) * 100) || 0;
+                const difficultPercent = Math.round((point.difficultCount / total) * 100) || 0;
+
+                html += `
+                    <div class="knowledge-item">
+                        <div class="knowledge-name">${point.name}</div>
+                        <div class="knowledge-stats">
+                            <div class="stat-item">
+                                <div class="stat-icon understood-bg"><i class="fas fa-check"></i></div>
+                                ${point.understoodCount}
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon learning-bg"><i class="fas fa-sync-alt"></i></div>
+                                ${point.learningCount}
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon difficult-bg"><i class="fas fa-times"></i></div>
+                                ${point.difficultCount}
+                            </div>
+                        </div>
+                    </div>
+                            <div class="progress-container" style="margin-bottom: 10px; position: relative;">
+            <div class="progress-bar progress-understood" style="width: ${understoodPercent}%; position: absolute;"></div>
+            <div class="progress-bar progress-learning" style="width: ${learningPercent}%; position: absolute; left: ${understoodPercent}%;"></div>
+            <div class="progress-bar progress-difficult" style="width: ${difficultPercent}%; position: absolute; left: ${understoodPercent + learningPercent}%;"></div>
+        </div>
+                `;
+            });
+
+            knowledgeList.innerHTML = html;
+            
+        }
+        // 渲染知识点交流次数图表
+        function renderInteractionChart(knowledgePoints) {
+            const ctx = document.getElementById('interaction-chart').getContext('2d');
+
+            // 如果已经存在图表，则销毁它
+            if (window.interactionChart) {
+                window.interactionChart.destroy();
+            }
+
+            // 准备数据
+            const sortedPoints = [...knowledgePoints].sort((a, b) => b.followUpQuestions - a.followUpQuestions);
+            const topPoints = sortedPoints.slice(0, 10); // 只显示交流次数最多的10个知识点
+
+            const labels = topPoints.map(p => p.name);
+            const interactionData = topPoints.map(p => p.followUpQuestions);
+
+            // 创建柱状图
+            window.interactionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '交流次数',
+                        data: interactionData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // 水平柱状图
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return `交流次数: ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '交流次数'
+                            },
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 显示交流详情表格
+            renderInteractionDetails(topPoints);
+        }
+
+        // 渲染交流详情表格
+        function renderInteractionDetails(knowledgePoints) {
+            const container = document.getElementById('interaction-details');
+
+            if (knowledgePoints.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted">暂无交流数据</div>';
+                return;
+            }
+
+            // 创建表格
+            let html = `
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>知识点</th>
+                            <th>交流次数</th>
+                            <th>理解状态</th>
+                            <th>交流频率指标</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            knowledgePoints.forEach(point => {
+                // 计算理解状态分布
+                const total = point.understoodCount + point.learningCount + point.difficultCount;
+                const understoodPercent = Math.round((point.understoodCount / total) * 100) || 0;
+
+                // 计算交流频率指标 (1-5星)
+                const interactionLevel = calculateInteractionLevel(point.followUpQuestions);
+
+                // 确定理解状态背景色
+                let statusClass = 'bg-warning text-dark'; // 默认为学习中 (黄色)
+                if (understoodPercent >= 70) {
+                    statusClass = 'bg-success text-white'; // 已理解 (绿色)
+                } else if (understoodPercent <= 30) {
+                    statusClass = 'bg-danger text-white'; // 难以理解 (红色)
+                }
+
+                html += `
+                <tr>
+                    <td>${point.name}</td>
+                    <td>${point.followUpQuestions}</td>
+                    <td><span class="badge ${statusClass}" style="padding: 5px 10px;">${understoodPercent}% 已理解</span></td>
+                    <td>${renderStars(interactionLevel)}</td>
+                </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-muted small mt-2">
+                <i class="fas fa-info-circle me-1"></i>
+                交流频率指标反映学生对该知识点的关注度和互动程度
+            </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // 计算交流频率指标 (1-5星)
+        function calculateInteractionLevel(count) {
+            if (count >= 20) return 5;
+            if (count >= 15) return 4;
+            if (count >= 10) return 3;
+            if (count >= 5) return 2;
+            return 1;
+        }
+
+        // 渲染星星评级
+        function renderStars(level) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= level) {
+                    stars += '<i class="fas fa-star text-warning"></i>'; // 实心星星
+                } else {
+                    stars += '<i class="far fa-star text-muted"></i>'; // 空心星星
+                }
+            }
+            return stars;
+        }
+
+
+        // 显示加载动画
+        function showLoading() {
+            const knowledgeList = document.getElementById('knowledge-list');
+            knowledgeList.innerHTML = `
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    `;
+        }
+
+        // 隐藏加载动画
+        function hideLoading() {
+            // 加载完成后自动处理
+        }
+
+        // 初始化页面
+        $(document).ready(function () {
+            // 加载初始数据
+            loadData();
+
+            // 时间筛选切换
+            $('.time-filter-option').click(function () {
+                $('.time-filter-option').removeClass('active');
+                $(this).addClass('active');
+                currentPeriod = $(this).data('period');
+                loadData();
+            });
+
+            // 学科标签切换
+            $('.subject-tab').click(function () {
+                $('.subject-tab').removeClass('active');
+                $(this).addClass('active');
+                currentSubject = $(this).data('subject');
+                loadData();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智领学程 - 教师管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #f7f9fc;
+        }
+
+        /* 主布局 */
+        .teacher-layout {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 12.5%;
+            background: linear-gradient(135deg, #1976d2, #0d47a1);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 应用标题 */
+        .app-title {
+            padding: 20px 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .app-title h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0;
+            color: white;
+        }
+
+        .app-title p {
+            font-size: 0.9rem;
+            margin: 5px 0 0;
+            opacity: 0.8;
+        }
+
+        /* 菜单列表 */
+        .sidebar-menu {
+            flex-grow: 1;
+            padding: 0 15px;
+        }
+
+        .sidebar-menu ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 12px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(3px);
+        }
+
+        .sidebar-menu a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: bold;
+        }
+
+        .menu-icon {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* 用户信息区域 */
+        .user-info {
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .user-details span {
+            display: block;
+        }
+
+        .user-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* 内容区域 */
+        .content-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background-color: #f7f9fc;
+        }
+
+        /* 页面标题 */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+
+        /* 卡片样式 */
+        .content-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .content-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            display: block;
+        }
+
+        .form-control {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px 12px;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+            outline: none;
+        }
+
+        textarea.form-control {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1565c0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background-color: #2e7d32;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #267129;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 表格样式 */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* 响应式调整 */
+        @@media (max-width: 992px) {
+            .sidebar {
+                width: 25%;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .teacher-layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+
+            .content-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="teacher-layout">
+        <!-- 左侧蓝色侧边栏 -->
+        <div class="sidebar">
+            <div class="app-title">
+                <h1>智领学程</h1>
+                <p>教师管理系统</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="/Teachers/Teacher?account=@(ViewBag.TeacherAccount)&name=@(ViewBag.TeacherName)" class="@(ViewBag.ActiveMenu == "Home" ? "active" : "")">
+                            <div class="menu-icon"><i class="fas fa-home"></i></div>
+                            <span>首页</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Teachers/GradeAnalysis?account=@(ViewBag.TeacherAccount)" class="@(ViewBag.ActiveMenu == "GradeAnalysis" ? "active" : "")">
+                            <div class="menu-icon"><i class="fas fa-chart-line"></i></div>
+                            <span>成绩分析</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Teachers/LessonPlanHelper?account=@(ViewBag.TeacherAccount)" class="@(ViewBag.ActiveMenu == "LessonPlanHelper" ? "active" : "")">
+                            <div class="menu-icon"><i class="fas fa-lightbulb"></i></div>
+                            <span>教案辅助</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Teachers/LessonPlanManagement?account=@(ViewBag.TeacherAccount)" class="@(ViewBag.ActiveMenu == "LessonPlanManagement" ? "active" : "")">
+                            <div class="menu-icon"><i class="fas fa-book"></i></div>
+                            <span>教案管理</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <span class="user-name">@(ViewBag.TeacherName ?? "教师用户")</span>
+                    <span class="user-role">@(ViewBag.TeacherAccount ?? "")</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧内容区域 -->
+        <div class="content-container">
+            @RenderBody()
+        </div>
+    </div>
+
+    <!-- JavaScript引用 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

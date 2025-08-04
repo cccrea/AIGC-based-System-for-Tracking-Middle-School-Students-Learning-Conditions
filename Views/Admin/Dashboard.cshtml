@@ -1,0 +1,211 @@
+﻿@{
+    ViewData["Title"] = "管理员仪表盘";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">管理员仪表盘</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item active">系统概况</li>
+    </ol>
+
+    <!-- 系统统计卡片 -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">@ViewBag.StudentCount</h4>
+                            <div>学生总数</div>
+                        </div>
+                        <i class="fas fa-user-graduate fa-3x opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="@Url.Action("ManageStudents")">查看详情</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">@ViewBag.TeacherCount</h4>
+                            <div>教师总数</div>
+                        </div>
+                        <i class="fas fa-chalkboard-teacher fa-3x opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="@Url.Action("ManageTeachers")">查看详情</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">@ViewBag.ParentCount</h4>
+                            <div>家长总数</div>
+                        </div>
+                        <i class="fas fa-user-friends fa-3x opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="@Url.Action("ManageParents")">查看详情</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">@ViewBag.SchoolCount</h4>
+                            <div>学校总数</div>
+                        </div>
+                        <i class="fas fa-school fa-3x opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="@Url.Action("ManageSchools")">查看详情</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快速操作卡片 -->
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-bolt me-1"></i>
+                    快速操作
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="@Url.Action("CreateSchool")" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-plus-circle me-2"></i> 添加学校
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="@Url.Action("CreateClass")" class="btn btn-success btn-lg w-100">
+                                <i class="fas fa-plus-circle me-2"></i> 添加班级
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="@Url.Action("CreateStudent")" class="btn btn-warning btn-lg w-100">
+                                <i class="fas fa-user-plus me-2"></i> 添加学生
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="@Url.Action("CreateTeacher")" class="btn btn-info btn-lg w-100">
+                                <i class="fas fa-user-plus me-2"></i> 添加教师
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    系统概况
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 50%">班级总数</th>
+                                    <td><span class="badge bg-secondary">@ViewBag.ClassCount</span></td>
+                                </tr>
+                                <tr>
+                                    <th>平均每个学校班级数</th>
+                                    <td>
+                                        @{
+                                            double avgClassesPerSchool = ViewBag.SchoolCount > 0
+                                            ? Math.Round((double)ViewBag.ClassCount / ViewBag.SchoolCount, 1)
+                                            : 0;
+                                        }
+                                        <span class="badge bg-secondary">@avgClassesPerSchool</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>平均每个班级学生数</th>
+                                    <td>
+                                        @{
+                                            double avgStudentsPerClass = ViewBag.ClassCount > 0
+                                            ? Math.Round((double)ViewBag.StudentCount / ViewBag.ClassCount, 1)
+                                            : 0;
+                                        }
+                                        <span class="badge bg-secondary">@avgStudentsPerClass</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>师生比例</th>
+                                    <td>
+                                        @{
+                                            string teacherStudentRatio = ViewBag.StudentCount > 0 && ViewBag.TeacherCount > 0
+                                            ? $"1 : {Math.Round((double)ViewBag.StudentCount / ViewBag.TeacherCount, 1)}"
+                                            : "N/A";
+                                        }
+                                        <span class="badge bg-secondary">@teacherStudentRatio</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 系统信息卡片 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-info-circle me-1"></i>
+            系统信息
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">服务器时间</h5>
+                            <p class="card-text text-muted">@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">系统版本</h5>
+                            <p class="card-text text-muted">智领学程 v1.0.0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">数据库状态</h5>
+                            <p class="card-text text-success">
+                                <i class="fas fa-check-circle me-1"></i> 正常运行中
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,149 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+    ViewBag.Title = "教案辅助";
+    ViewBag.ActiveMenu = "LessonPlanHelper";
+}
+
+<div class="page-header">
+    <h1 class="page-title">教案辅助</h1>
+</div>
+
+<div class="content-card">
+    <h3><i class="fas fa-magic text-primary me-2"></i> AI辅助教案生成</h3>
+    <p class="text-muted">在下方表单中填写教案基本信息，系统将利用AI技术为您生成完整的教案内容。</p>
+
+    <div class="row mt-4">
+        <div class="col-lg-8">
+            <div class="lesson-plan-form">
+                <div class="form-group">
+                    <label for="topic">课题</label>
+                    <textarea id="topic" class="form-control" placeholder="设置一个便于查找的题目，如" 二年级第一课"或文章题目。"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="lesson-time">课时</label>
+                    <textarea id="lesson-time" class="form-control" placeholder="这节课所需的时间，严格把控时间及课程中的每一个环节。"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="preparation">课前准备</label>
+                    <textarea id="preparation" class="form-control" placeholder="根据教学设计，备注出需要的上课道具，以免上课缺少道具。"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="goals">教学目标</label>
+                    <textarea id="goals" class="form-control" placeholder="明确这节课要让学生学会、理解和懂得的内容，即教学任务。"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="key-points">教学重点</label>
+                    <textarea id="key-points" class="form-control" placeholder="列出几个主要的教学目标，其中一两个是学生必须掌握的。"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="difficulties">教学难点</label>
+                    <textarea id="difficulties" class="form-control" placeholder="列出一两个学生上课时会比较难掌握的地方。"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="intro">课前导入</label>
+                    <textarea id="intro" class="form-control" placeholder="设计课程的开始部分，可以是与主题相关的游戏、故事，或者提问方式进行导入。"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="teaching-steps">授课环节</label>
+                    <textarea id="teaching-steps" class="form-control" placeholder="设计教学步骤，包括知识点回顾的小环节，加深学生印象。"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card bg-light h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-info-circle text-info me-2"></i> 使用指南</h5>
+                    <p class="card-text small">填写左侧表单后，点击"生成教案"按钮，AI将根据您提供的信息自动生成完整的教案内容。</p>
+
+                    <h6 class="mt-4 text-primary">填写技巧:</h6>
+                    <ul class="small">
+                        <li class="mb-2">尽可能详细描述课程内容和教学目标</li>
+                        <li class="mb-2">明确指出教学重点和难点，有助于AI生成更针对性的内容</li>
+                        <li class="mb-2">提供一些教学活动的想法，AI将为您扩展和完善</li>
+                        <li class="mb-2">填写时可参考以往成功的教案经验</li>
+                    </ul>
+
+                    <h6 class="mt-4 text-primary">生成后您可以:</h6>
+                    <ul class="small">
+                        <li class="mb-2">下载生成的教案内容</li>
+                        <li class="mb-2">对内容进行编辑和调整</li>
+                        <li class="mb-2">保存到教案管理系统中</li>
+                        <li class="mb-2">通过上传功能分享给其他教师</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button id="generateLessonPlan" class="btn btn-primary">
+            <i class="fas fa-wand-magic-sparkles me-2"></i> 生成教案
+        </button>
+        <button class="btn btn-outline-secondary ms-2">
+            <i class="fas fa-save me-2"></i> 保存草稿
+        </button>
+    </div>
+</div>
+
+<div class="content-card mt-4" id="aiGeneratedContent" style="display: none;">
+    <h3><i class="fas fa-file-alt text-success me-2"></i> AI生成的教案内容</h3>
+    <div class="alert alert-info mt-3">
+        <i class="fas fa-robot me-2"></i> AI已根据您提供的信息生成了教案内容。您可以查看、编辑并下载。
+    </div>
+
+    <div class="bg-light p-4 rounded mt-3" id="generatedContent">
+        <!-- AI生成的内容将显示在这里 -->
+    </div>
+
+    <div class="mt-4">
+        <button class="btn btn-success">
+            <i class="fas fa-download me-2"></i> 下载教案
+        </button>
+        <button class="btn btn-primary ms-2">
+            <i class="fas fa-edit me-2"></i> 编辑内容
+        </button>
+        <button class="btn btn-info ms-2">
+            <i class="fas fa-cloud-upload-alt me-2"></i> 保存到教案库
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/LessonPlanHelper.js"></script>
+    <script>
+        $(document).ready(function () {
+            // 修改生成教案按钮的点击事件，添加加载效果并显示结果区域
+            $('#generateLessonPlan').on('click', function () {
+                var btn = $(this);
+                var originalText = btn.html();
+
+                // 显示加载状态
+                btn.html('<i class="fas fa-spinner fa-spin me-2"></i> 正在生成...');
+                btn.prop('disabled', true);
+
+                // 模拟API调用延迟
+                setTimeout(function () {
+                    // 恢复按钮状态
+                    btn.html(originalText);
+                    btn.prop('disabled', false);
+
+                    // 显示生成的内容区域
+                    $('#aiGeneratedContent').fadeIn();
+
+                    // 滚动到结果区域
+                    $('html, body').animate({
+                        scrollTop: $('#aiGeneratedContent').offset().top - 20
+                    }, 500);
+                }, 2000);
+            });
+        });
+    </script>
+}

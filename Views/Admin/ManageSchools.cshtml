@@ -1,0 +1,101 @@
+﻿@model IEnumerable<test4.Models.School>
+@{
+    ViewData["Title"] = "学校管理";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">学校管理</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="@Url.Action("Dashboard", "Admin")">仪表盘</a></li>
+        <li class="breadcrumb-item active">学校管理</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-school me-1"></i>
+                学校列表
+            </div>
+            <a href="@Url.Action("CreateSchool", "Admin")" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus-circle me-1"></i> 添加学校
+            </a>
+        </div>
+        <div class="card-body">
+            <table id="schoolsTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>学校名称</th>
+                        <th>地址</th>
+                        <th>联系电话</th>
+                        <th>班级数量</th>
+                        <th>学生数量</th>
+                        <th>教师数量</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var school in Model)
+                    {
+                        <tr>
+                            <td>@school.Id</td>
+                            <td>@school.Name</td>
+                            <td>@school.Address</td>
+                            <td>@school.Phone</td>
+                            <td>
+                                @{
+                                    var classCount = school.Classes?.Count ?? 0;
+                                    <span class="badge bg-info">@classCount</span>
+                                }
+                            </td>
+                            <td>
+                                @{
+                                    var studentCount = school.Students?.Count ?? 0;
+                                    <span class="badge bg-primary">@studentCount</span>
+                                }
+                            </td>
+                            <td>
+                                @{
+                                    var teacherCount = school.Teachers?.Count ?? 0;
+                                    <span class="badge bg-success">@teacherCount</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="@Url.Action("EditSchool", "Admin", new { id = school.Id })" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit"></i> 编辑
+                                    </a>
+                                    <a href="@Url.Action("DeleteSchool", "Admin", new { id = school.Id })" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i> 删除
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // 初始化数据表格
+            const datatablesSimple = document.getElementById('schoolsTable');
+            if (datatablesSimple) {
+                new simpleDatatables.DataTable(datatablesSimple, {
+                    perPage: 10,
+                    perPageSelect: [5, 10, 15, 20, 25],
+                    labels: {
+                        placeholder: "搜索...",
+                        perPage: "{select} 条/页",
+                        noRows: "无数据",
+                        info: "显示第 {start} 至 {end} 条记录，共 {rows} 条"
+                    }
+                });
+            }
+        });
+    </script>
+}

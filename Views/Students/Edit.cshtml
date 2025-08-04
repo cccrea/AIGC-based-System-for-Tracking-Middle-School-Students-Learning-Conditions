@@ -1,0 +1,108 @@
+﻿@model test4.Models.Student
+
+@{
+    ViewData["Title"] = "编辑个人信息";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary">
+            <h4 style="color: white;">编辑学生信息</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Account" />
+
+                        <h5 style="color: #333; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">个人基本信息</h5>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Name" class="control-label fw-bold" style="color: #333;">姓名</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                            <small class="form-text text-muted">请输入您的真实姓名</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PhoneNumber" class="control-label fw-bold" style="color: #333;">手机号码</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            <small class="form-text text-muted">用于登录和接收通知</small>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Password" class="control-label fw-bold" style="color: #333;">密码</label>
+                            <input asp-for="Password" class="form-control" type="password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                            <small class="form-text text-muted">请设置安全密码，建议包含字母、数字和特殊字符</small>
+                        </div>
+
+                        <h5 style="color: #333; margin-bottom: 20px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">关联账号信息</h5>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="ParentAccount" class="control-label fw-bold" style="color: #333;">家长账号</label>
+                            <input asp-for="ParentAccount" class="form-control" />
+                            <span asp-validation-for="ParentAccount" class="text-danger"></span>
+                            <small class="form-text text-muted">关联的家长账号</small>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="ChineseTeacherAccount" class="control-label fw-bold" style="color: #333;">语文教师账号</label>
+                                    <input asp-for="ChineseTeacherAccount" class="form-control" />
+                                    <span asp-validation-for="ChineseTeacherAccount" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="MathTeacherAccount" class="control-label fw-bold" style="color: #333;">数学教师账号</label>
+                                    <input asp-for="MathTeacherAccount" class="form-control" />
+                                    <span asp-validation-for="MathTeacherAccount" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="EnglishTeacherAccount" class="control-label fw-bold" style="color: #333;">英语教师账号</label>
+                                    <input asp-for="EnglishTeacherAccount" class="form-control" />
+                                    <span asp-validation-for="EnglishTeacherAccount" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary">返回列表</a>
+                            <input type="submit" value="保存" class="btn btn-primary" style="color: white;" />
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title" style="color: #333;">提示信息</h5>
+                            <p class="card-text" style="color: #555;">
+                                此页面用于编辑学生的个人信息。请确保填写的信息准确无误。
+                            </p>
+                            <ul class="list-unstyled">
+                                <li style="color: #444;"><i class="fas fa-info-circle text-primary me-2"></i>学号不可修改</li>
+                                <li style="color: #444;"><i class="fas fa-info-circle text-primary me-2"></i>请使用真实姓名</li>
+                                <li style="color: #444;"><i class="fas fa-info-circle text-primary me-2"></i>请确保手机号码正确</li>
+                                <li style="color: #444;"><i class="fas fa-info-circle text-primary me-2"></i>关联账号由系统自动验证</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

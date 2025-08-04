@@ -1,0 +1,15 @@
+﻿@page
+@model test4.Pages.RoleSelectionModel
+@{
+    ViewData["Title"] = "选择用户类型";
+}
+
+<h2>请选择用户类型</h2>
+
+<div>
+    <form>
+        <button type="button" onclick="window.location.href='/Teachers/Create'">老师</button>
+        <button type="button" onclick="window.location.href='/Students/Create'">学生</button>
+        <button type="button" onclick="window.location.href='/Parents/Create'">家长</button>
+    </form>
+</div>

@@ -1,0 +1,198 @@
+﻿@{
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+    ViewBag.Title = "成绩分析";
+    ViewBag.ActiveMenu = "GradeAnalysis";
+}
+
+<div class="page-header">
+    <h1 class="page-title">成绩分析</h1>
+</div>
+
+<div class="content-card">
+    <h3><i class="fas fa-upload text-primary me-2"></i> 成绩数据管理</h3>
+    <p>上传Excel格式的成绩数据文件进行分析。请确保文件包含"姓名"和"成绩"两列。</p>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadGradeModal">
+                <i class="fas fa-file-upload me-2"></i> 上传成绩数据
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h4>已上传的成绩文件</h4>
+        <div class="table-responsive">
+            <table id="gradeFileList" class="table">
+                <thead>
+                    <tr>
+                        <th>文件名称</th>
+                        <th>上传日期</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="empty-grade-row">
+                        <td colspan="3" class="text-center py-4">
+                            <i class="fas fa-spinner fa-spin me-2"></i> 正在加载成绩文件列表...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="content-card mt-4" id="gradeDataCard" style="display: none;">
+    <h3><i class="fas fa-table text-primary me-2"></i> <span id="currentFileName">成绩数据</span></h3>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="data-info mb-3">
+                <span class="badge bg-info me-2">总人数: <span id="totalStudents">0</span></span>
+                <span class="badge bg-success me-2">平均分: <span id="averageScore">0</span></span>
+                <span class="badge bg-warning me-2">最高分: <span id="highestScore">0</span></span>
+                <span class="badge bg-danger me-2">最低分: <span id="lowestScore">0</span></span>
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <div class="btn-group" role="group">
+                <button id="sortNameBtn" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-sort-alpha-down me-1"></i> 按姓名排序
+                </button>
+                <button id="sortScoreBtn" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-sort-numeric-down me-1"></i> 按成绩排序
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive mt-4">
+        <table id="gradeDataTable" class="table">
+            <thead>
+                <tr>
+                    <th>姓名</th>
+                    <th>成绩</th>
+                    <th>评级</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 成绩数据将动态添加到此处 -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="content-card mt-4" id="gradeChartCard" style="display: none;">
+    <h3><i class="fas fa-chart-bar text-success me-2"></i> 数据可视化</h3>
+    <p>选择适合的图表类型，对学生成绩进行可视化分析。</p>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="chartType" class="form-label">选择图表类型：</label>
+                <select id="chartType" class="form-select">
+                    <option value="bar">条形图</option>
+                    <option value="line">折线图</option>
+                    <option value="pie">饼图</option>
+                    <option value="scatter">散点图</option>
+                    <option value="histogram">直方图</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="filterOptions" class="form-label">筛选选项：</label>
+                <select id="filterOptions" class="form-select">
+                    <option value="all">全部学生</option>
+                    <option value="above90">90分以上</option>
+                    <option value="above80">80分以上</option>
+                    <option value="above70">70分以上</option>
+                    <option value="above60">60分以上</option>
+                    <option value="below60">60分以下</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="chart-container bg-light rounded" style="height: 400px; position: relative;">
+                <canvas id="gradeChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content-card mt-4" id="analysisReportCard" style="display: none;">
+    <h3><i class="fas fa-file-alt text-warning me-2"></i> 成绩分析报告</h3>
+    <div id="analysisReport" class="mt-3 p-4 bg-light rounded">
+        <!-- 分析报告内容将动态生成 -->
+    </div>
+    <div class="mt-3">
+        <button id="generateReportBtn" class="btn btn-success">
+            <i class="fas fa-magic me-2"></i> 生成分析报告
+        </button>
+        <button id="exportReportBtn" class="btn btn-outline-primary ms-2">
+            <i class="fas fa-download me-2"></i> 导出报告
+        </button>
+    </div>
+</div>
+
+<!-- 上传成绩文件模态框 -->
+<div class="modal fade" id="uploadGradeModal" tabindex="-1" aria-labelledby="uploadGradeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadGradeModalLabel">上传成绩数据</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> 请上传Excel格式的成绩文件。文件应包含两列：姓名、成绩。
+                </div>
+                <form id="uploadGradeForm">
+                    <div class="mb-3">
+                        <label for="gradeFileName" class="form-label">文件名称</label>
+                        <input type="text" class="form-control" id="gradeFileName" placeholder="例如：2023年秋季学期期末考试">
+                    </div>
+                    <div class="mb-3">
+                        <label for="gradeFileInput" class="form-label">选择文件</label>
+                        <input type="file" class="form-control" id="gradeFileInput" accept=".xlsx,.xls">
+                        <small class="text-muted">支持的格式：.xlsx, .xls</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="submitGradeUpload">
+                    <i class="fas fa-upload me-2"></i> 确认上传
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认模态框 -->
+<div class="modal fade" id="deleteGradeFileModal" tabindex="-1" aria-labelledby="deleteGradeFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteGradeFileModalLabel">确认删除</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                确定要删除这个成绩文件吗？此操作无法撤销。
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteGradeFile">确认删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="~/js/GradeAnalysis.js"></script>
+}

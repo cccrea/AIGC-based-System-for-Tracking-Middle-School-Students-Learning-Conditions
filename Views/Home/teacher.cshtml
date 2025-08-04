@@ -1,0 +1,192 @@
+﻿@{
+    Layout = null;  // 根据你的项目设置调整布局
+}
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教师页面</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 使用 Flexbox 创建左右布局 */
+        .teacher-layout {
+            display: flex; /* 使用 Flexbox 创建左右布局 */
+            height: 100vh; /* 页面高度撑满 */
+        }
+
+        .sidebar {
+            background-color: #1e88e5; /* 蓝色背景 */
+            width: 12.5%; /* 左侧菜单宽度为12.5% */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* 调整为靠上对齐 */
+            padding: 10px;
+            color: white;
+        }
+
+            .sidebar ul {
+                list-style-type: none; /* 去除列表项默认样式 */
+                padding: 0;
+            }
+
+                .sidebar ul li {
+                    margin-bottom: 20px; /* 每个选项之间的间隔 */
+                }
+
+                    .sidebar ul li a {
+                        color: white; /* 链接文字为白色 */
+                        text-decoration: none; /* 去除链接下划线 */
+                        font-weight: bold;
+                    }
+
+                        .sidebar ul li a:hover {
+                            text-decoration: underline; /* 鼠标悬停时添加下划线 */
+                        }
+
+        .chat-window {
+            background-color: white; /* 右侧白色背景 */
+            width: 87.5%; /* 右侧区域宽度为87.5% */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* 调整为靠上对齐 */
+            padding: 20px 20px; /* 减少左右和上下的内边距 */
+            border-left: 2px solid #ccc; /* 右侧和左侧区域的分割线 */
+        }
+
+            .chat-window h2 {
+                margin-top: 0;
+            }
+
+        .lesson-plan-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* 各个文本框之间的间距 */
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .generate-btn {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #generateLessonPlan {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+            #generateLessonPlan:hover {
+                background-color: #1565c0;
+            }
+
+        .tooltip {
+            margin-left: 10px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+            .tooltip:hover {
+                color: #1e88e5;
+            }
+
+
+        textarea {
+            resize: vertical; /* 允许用户垂直调整文本框大小 */
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            min-height: 60px; /* 最小高度 */
+            transition: all 0.3s ease-in-out; /* 动效：文本框的平滑过渡 */
+        }
+
+            textarea:focus {
+                border-color: #1e88e5; /* 聚焦时的边框颜色 */
+                outline: none;
+            }
+
+            textarea::placeholder {
+                color: #aaa; /* 灰色的占位符 */
+            }
+
+            textarea:not(:placeholder-shown) {
+                height: auto; /* 自动调整高度以适应输入内容 */
+            }
+
+        uploadLessonPlan {
+            padding: 5px 15px; /* 调整按钮的内边距，左右变窄 */
+            font-size: 16px;
+            background-color: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: auto; /* 让按钮根据内容宽度自动调整 */
+        }
+
+           uploadLessonPlan:hover {
+                background-color: #1565c0;
+            }
+
+        #submitUpload {
+            padding: 5px 15px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: auto;
+        }
+
+            #submitUpload:hover {
+                background-color: #218838;
+            }
+
+    </style>
+</head>
+<body>
+    <div class="teacher-layout">
+        <!-- 左侧蓝色功能区 -->
+        <div class="sidebar">
+            <ul>
+                <li><a href="#">成绩分析</a></li>
+                <li><a href="#">教案辅助</a></li>
+                <li><a href="#">教案管理</a></li>
+            </ul>
+        </div>
+
+        <!-- 右侧功能区（聊天窗口）-->
+        <div class="chat-window">
+            <h2>欢迎来到教师后台</h2>
+            <p>在这里你可以管理成绩分析和教案辅助功能。</p>
+
+            <!-- 可根据需求动态更新内容 -->
+            <div id="content">
+                <p>选中左侧菜单项后，这里会显示相应的功能页面。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 插件 (例如，Bootstrap功能) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/teacher.js" type="module"></script> <!-- 引入外部 JavaScript 文件 -->
+</body>
+</html>

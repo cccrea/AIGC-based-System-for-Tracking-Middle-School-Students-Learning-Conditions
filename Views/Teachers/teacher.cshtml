@@ -1,0 +1,159 @@
+﻿@model test4.Models.UserInfo
+@{
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+    ViewBag.Title = "教师中心";
+    ViewBag.ActiveMenu = "Home";
+    ViewBag.TeacherName = Model.Name;
+    ViewBag.TeacherAccount = Model.Account;
+}
+
+<div class="page-header">
+    <h1 class="page-title">欢迎来到教师中心</h1>
+</div>
+
+<div class="row">
+    <!-- 快速访问卡片 -->
+    <div class="col-md-6 mb-4">
+        <div class="content-card">
+            <h3><i class="fas fa-bolt text-warning me-2"></i> 快速访问</h3>
+            <div class="row g-3 mt-3">
+                <div class="col-md-6">
+                    <a href="/Teachers/GradeAnalysis" class="btn btn-primary w-100 py-3">
+                        <i class="fas fa-chart-line me-2"></i> 成绩分析
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <a href="/Teachers/LessonPlanHelper" class="btn btn-success w-100 py-3">
+                        <i class="fas fa-lightbulb me-2"></i> 教案辅助
+                    </a>
+                </div>
+                <div class="col-md-6 mt-3">
+                    <a href="/Teachers/LessonPlanManagement?account=@Model.Account" class="btn btn-info w-100 py-3 text-white">
+                        <i class="fas fa-book me-2"></i> 教案管理
+                    </a>
+                </div>
+                <div class="col-md-6 mt-3">
+                    <a href="#" class="btn btn-secondary w-100 py-3">
+                        <i class="fas fa-cog me-2"></i> 系统设置
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 统计信息卡片 -->
+    <div class="col-md-6 mb-4">
+        <div class="content-card h-100">
+            <h3><i class="fas fa-tachometer-alt text-primary me-2"></i> 概览统计</h3>
+            <div class="row g-3 mt-3">
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded">
+                        <h5 class="fw-bold text-primary mb-1">12</h5>
+                        <div class="text-muted small">今日活跃学生</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded">
+                        <h5 class="fw-bold text-success mb-1">4</h5>
+                        <div class="text-muted small">已上传教案</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded">
+                        <h5 class="fw-bold text-info mb-1">24</h5>
+                        <div class="text-muted small">总学生数</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded">
+                        <h5 class="fw-bold text-warning mb-1">78%</h5>
+                        <div class="text-muted small">平均活跃度</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 最近活动卡片 -->
+    <div class="col-md-6 mb-4">
+        <div class="content-card">
+            <h3><i class="fas fa-clock text-info me-2"></i> 最近活动</h3>
+            <ul class="list-group list-group-flush mt-3">
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0 border-bottom">
+                    <div>
+                        <i class="fas fa-upload text-primary me-2"></i>
+                        <span>上传了新教案《语文基础知识》</span>
+                    </div>
+                    <span class="text-muted small">2小时前</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0 border-bottom">
+                    <div>
+                        <i class="fas fa-chart-bar text-success me-2"></i>
+                        <span>进行了成绩分析</span>
+                    </div>
+                    <span class="text-muted small">昨天</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0 border-bottom">
+                    <div>
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        <span>使用AI辅助生成了新教案</span>
+                    </div>
+                    <span class="text-muted small">3天前</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 待办事项卡片 -->
+    <div class="col-md-6 mb-4">
+        <div class="content-card">
+            <h3><i class="fas fa-tasks text-danger me-2"></i> 待办事项</h3>
+            <ul class="list-group list-group-flush mt-3">
+                <li class="list-group-item d-flex align-items-center px-0 py-3 border-0 border-bottom">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="todo1">
+                        <label class="form-check-label" for="todo1">
+                            上传本周教学计划
+                        </label>
+                    </div>
+                    <span class="badge bg-danger ms-auto">今天</span>
+                </li>
+                <li class="list-group-item d-flex align-items-center px-0 py-3 border-0 border-bottom">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="todo2">
+                        <label class="form-check-label" for="todo2">
+                            分析三年级期中考试成绩
+                        </label>
+                    </div>
+                    <span class="badge bg-warning ms-auto">明天</span>
+                </li>
+                <li class="list-group-item d-flex align-items-center px-0 py-3 border-0 border-bottom">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="todo3">
+                        <label class="form-check-label" for="todo3">
+                            准备下周备课材料
+                        </label>
+                    </div>
+                    <span class="badge bg-info ms-auto">本周内</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // 为复选框添加点击效果
+            $('.form-check-input').on('change', function () {
+                if ($(this).is(':checked')) {
+                    $(this).parent().find('.form-check-label').css('text-decoration', 'line-through');
+                } else {
+                    $(this).parent().find('.form-check-label').css('text-decoration', 'none');
+                }
+            });
+        });
+    </script>
+}
