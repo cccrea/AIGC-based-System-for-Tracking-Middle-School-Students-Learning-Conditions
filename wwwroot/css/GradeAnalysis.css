@@ -1,0 +1,35 @@
+﻿/* 成绩分析相关样式 */
+.grade-analysis-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+    .grade-analysis-table th, .grade-analysis-table td {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
+
+    .grade-analysis-table th {
+        background-color: #f1f1f1;
+    }
+
+.chart-type-selector {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#generateChart {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #1e88e5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    #generateChart:hover {
+        background-color: #1565c0;
+    }
